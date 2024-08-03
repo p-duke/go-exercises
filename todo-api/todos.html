@@ -31,6 +31,7 @@
         <li class="todo-item {{if .Done}}done{{end}}">{{.Description}}</li>
         {{end}}
     </ul>
+    {{ template "create-todo.html" . }}
 </body>
 </html>
 
