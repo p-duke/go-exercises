@@ -1,52 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"html/template"
-	"io/fs"
 	"log"
 	"net/http"
-	"os"
+	"strconv"
 	"time"
 )
 
-type TodoItem struct {
-	ID          int        `json:"id"`
-	Description string     `json:"description"`
-	Done        bool       `json:"done"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	CompletedAt *time.Time `json:"completedAt"`
-}
-
-type TodoList struct {
-	items []*TodoItem
-}
-
-var templates = template.Must(template.ParseFiles("todos.html", "create-todo.html"))
-
-func (tl *TodoList) load() {
-	data, err := os.ReadFile("todos.json")
-	if err != nil {
-		log.Fatal("Error reading todos.json", err)
-	}
-
-	if err := json.Unmarshal(data, &tl.items); err != nil {
-		log.Fatal("Error unmarshaling", err)
-	}
-}
-
-func (tl *TodoList) save(todo *TodoItem) {
-	tl.items = append(tl.items, todo)
-	json, err := json.Marshal(&tl.items)
-	if err != nil {
-		log.Fatal("save err while marshaling", err)
-	}
-
-	err = os.WriteFile("todos.json", json, fs.ModePerm)
-	if err != nil {
-		log.Fatal("save err while writing file", err)
-	}
-}
+var templates = template.Must(template.ParseFiles("todos.html", "create-todo.html", "delete-todo.html"))
 
 func index(w http.ResponseWriter, r *http.Request) {
 	todoList := &TodoList{}
@@ -83,14 +45,33 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func destroy(w http.ResponseWriter, r *http.Request) {
+	todoList := &TodoList{}
+	todoList.load()
+	id, err := strconv.Atoi(r.FormValue("todo_id"))
+	if err != nil {
+		log.Fatal("Problem converting string to integer", err)
+	}
+	todoList.complete(id)
+	todoList.save(nil)
+
+	err = templates.ExecuteTemplate(w, "todos.html", todoList.items)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func update(w http.ResponseWriter, r *http.Request) {
 }
 
-func destroy(w http.ResponseWriter, r *http.Request) {
-}
-
 func resourceHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
+	method := r.Method
+
+	if r.FormValue("_method") == "DELETE" {
+		method = "DELETE"
+	}
+
+	switch method {
 	case "GET":
 		index(w, r)
 	case "POST":

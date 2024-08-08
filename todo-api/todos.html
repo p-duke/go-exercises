@@ -29,6 +29,7 @@
     <ul class="todo-list">
         {{range .}}
         <li class="todo-item {{if .Done}}done{{end}}">{{.Description}}</li>
+        {{ template "delete-todo.html" . }}
         {{end}}
     </ul>
     {{ template "create-todo.html" . }}

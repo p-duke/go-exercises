@@ -1,0 +1,7 @@
+{{ define "delete-todo.html" }}
+<form action="/todos/" method="DELETE">
+  <input type="hidden" name="todo_id" value="{{ .ID }}">
+  <input type="hidden" name="_method" value="DELETE">
+  <button type="submit">Complete</button>
+</form>
+{{ end }}
