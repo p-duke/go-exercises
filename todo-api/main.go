@@ -8,7 +8,12 @@ import (
 	"time"
 )
 
-var templates = template.Must(template.ParseFiles("todos.html", "create-todo.html", "delete-todo.html"))
+var templates = template.Must(template.ParseFiles(
+	"todos.html",
+	"create-todo.html",
+	"delete-todo.html",
+	"edit-todo.html",
+))
 
 func index(w http.ResponseWriter, r *http.Request) {
 	todoList := &TodoList{}
@@ -62,13 +67,27 @@ func destroy(w http.ResponseWriter, r *http.Request) {
 }
 
 func update(w http.ResponseWriter, r *http.Request) {
+	todoList := &TodoList{}
+	todoList.load()
+	id, err := strconv.Atoi(r.FormValue("todo_id"))
+	if err != nil {
+		log.Fatal("Problem converting string to integer", err)
+	}
+	todoList.update(id, r.FormValue("item"))
+	todoList.save(nil)
+
+	err = templates.ExecuteTemplate(w, "todos.html", todoList.items)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func resourceHandler(w http.ResponseWriter, r *http.Request) {
 	method := r.Method
 
-	if r.FormValue("_method") == "DELETE" {
-		method = "DELETE"
+	if len(r.FormValue("_method")) > 0 {
+		val := r.FormValue("_method")
+		method = val
 	}
 
 	switch method {

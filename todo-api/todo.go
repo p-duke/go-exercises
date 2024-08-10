@@ -31,17 +31,6 @@ func (tl *TodoList) load() {
 	}
 }
 
-func (tl *TodoList) complete(id int) {
-	for i := 0; i < len(tl.items); i++ {
-		item := tl.items[i]
-		if item.ID == id {
-			item.Done = true
-			item.CreatedAt = time.Now()
-		}
-	}
-
-}
-
 func (tl *TodoList) save(todo *TodoItem) {
 	if todo != nil {
 		tl.items = append(tl.items, todo)
@@ -55,5 +44,26 @@ func (tl *TodoList) save(todo *TodoItem) {
 	err = os.WriteFile("todos.json", json, fs.ModePerm)
 	if err != nil {
 		log.Fatal("save err while writing file", err)
+	}
+}
+
+func (tl *TodoList) complete(id int) {
+	for i := 0; i < len(tl.items); i++ {
+		item := tl.items[i]
+		if item.ID == id {
+			now := time.Now()
+			item.Done = true
+			item.CompletedAt = &now
+		}
+	}
+
+}
+
+func (tl *TodoList) update(id int, desc string) {
+	for i := 0; i < len(tl.items); i++ {
+		item := tl.items[i]
+		if item.ID == id {
+			item.Description = desc
+		}
 	}
 }

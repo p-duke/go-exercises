@@ -1,0 +1,78 @@
+{{ define "edit-todo.html" }}
+<button id="editTodoBtn-{{.ID}}">Edit Todo</button>
+
+<div id="editTodoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-edit">&times;</span>
+        <h2>Edit Todo</h2>
+        <form action="/todos/" method="POST">
+            <input type="hidden" name="_method" value="PATCH">
+            <input type="hidden" name="todo_id" value="{{ .ID }}">
+            <input type="text" id="edit-item" name="item" required>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+  // Get the modal
+  var editModal = document.getElementById("editTodoModal");
+
+  // Get the button that opens the modal
+  var editBtn = document.getElementById("editTodoBtn-{{.ID}}");
+
+  // Get the <span> element that closes the modal
+  var editClose = document.getElementsByClassName("close-edit")[0];
+
+  // When the user clicks the button, open the modal
+  editBtn.onclick = function() {
+    editModal.style.display = "block";
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  editClose.onclick = function() {
+    editModal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      editModal.style.display = "none";
+    }
+  }
+</script>
+{{ end }}
