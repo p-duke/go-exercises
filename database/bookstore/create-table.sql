@@ -59,4 +59,14 @@ CREATE TABLE orders_books (
     FOREIGN KEY(book_id) REFERENCES books(id)
 );
 
+CREATE TABLE reviews (
+  id SERIAL PRIMARY KEY,
+  book_id INT NOT NULL
+  customer_id INT NOT NULL,
+  rating INT NOT NULL,
+  CHECK (rating BETWEEN 1 AND 5)
+  text VARCHAR(300) -- We're not sure how big this should be so guessing here
+  CONSTRAINT fk_book
+    FOREIGN KEY(book_id) REFERENCES books(id)
+);
 

@@ -23,6 +23,32 @@ const usersCanCreateAccount = `
 INSERT INTO customers (username, email, password, shipping_address) VALUES (?, ?, ?, ?);
 `
 
+const usersCanAddToCart = `
+INSERT INTO carts (book_id)
+VALUES (123445)
+WHERE cart_id = (SELECT cart_id FROM customers WHERE customer_id = ?);
+`
+
+// Req: Customers can leave reviews for books they have purchased
+const customerAddReview = `
+INSERT INTO reviews (book_id, customer_id, rating, text)
+VALUES (1234, ?, 5, "I love this book!")
+WHERE customer_id = ?
+`
+
+// Req: Customers can leave reviews for books they have purchased
+// We have customer_id and book_id
+const hasCustomerPurchasedBook = `
+SELECT book_id
+FROM orders_books
+WHERE order_id IN (
+	SELECT id
+	FROM orders
+	WHERE customer_id = ?
+)
+AND book_id = ?
+`
+
 func main() {
 	// Define the PostgreSQL connection string.
 	connStr := "host=localhost port=5432 user=peter.duke dbname=bookstore sslmode=disable"
